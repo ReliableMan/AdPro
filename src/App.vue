@@ -1,23 +1,11 @@
 <script setup>
-import { onMounted, ref } from 'vue';
-import axios from 'axios';
+import { onMounted } from 'vue';
+import { usePostStore } from './store/index';
 
-const data = ref([]);
-
+const postStore = usePostStore();
 onMounted(() => {
-  async function getData() {
-    try { 
-      const response = await axios.get('https://dev.aicap.tech/api/v1/interview/projects/');
-      data.value = response.data
-    } catch (err) {
-      console.log(err)
-    } finally {
-      console.log('request is completed')
-    }
-  }
-  getData()
-})
-
+  postStore.getPosts()
+}) 
 </script>
 
 <template>
@@ -41,7 +29,7 @@ onMounted(() => {
   </div>
   <hr>
   <div class="w-full transform translate-x-20 translate-y-5 flex flex-col flex-wrap gap-3 mb-10">
-    <div v-for="items in data.results" :key="items.id">
+    <div v-for="items in postStore.posts" :key="items.id">
       <a class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
           <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"><strong>{{ items.id }}</strong> {{ items.status }}</h5>
           <p class="font-normal text-gray-700 dark:text-gray-400">{{ items.title }}</p>
