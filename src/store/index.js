@@ -7,14 +7,14 @@ const url = "https://dev.aicap.tech/api/v1/interview/projects/"
 export const usePostStore = defineStore("postStore", () => {
   const loader = ref(false)
   const posts = ref([]);
-
   const getPosts = async () => {
     try {
-      // loader.value = true;
+      loader.value = true;
       const response = await axios.get(url);
-      posts.value = response.data.results;
-      console.log('posts', posts.value)
-      // loader.value = false
+      posts.value = await response.data.results;
+      setTimeout( async () => {
+        loader.value = false
+      }, 1000)
     } catch (err) { 
       console.log(err)
     } finally {
@@ -23,16 +23,20 @@ export const usePostStore = defineStore("postStore", () => {
     }
   }
   
-  const postOnLocalStorage = localStorage.getItem("posts");
-  postOnLocalStorage ? posts.value = JSON.parse(postOnLocalStorage)._value : '';
+  const postOnLocalStorage = JSON.parse(localStorage.getItem("posts"));
 
-  watch(() => posts, (state) => {
-    localStorage.setItem('posts', JSON.stringify(state))
-  })
+  const filteredPosts = function onChange(val) {
+    const tempVariable = postOnLocalStorage;
+      val === "1" ? posts.value = tempVariable.filter((elem) => elem.status ==='IN_PROGRESS') : '';
+      val === "2" ? posts.value = tempVariable.filter((elem) => elem.status ==='FINISHED') : '';
+      val === "3" ? posts.value = tempVariable : '';
+  }
 
   return {
     loader,
     posts,
     getPosts,
+    filteredPosts,
+    postOnLocalStorage
   }
 })
